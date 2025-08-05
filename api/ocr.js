@@ -16,7 +16,7 @@ export default async function handler(req, res) {
   // === Добавляем логирование ===
   console.log('Получен запрос:', req.method, req.url);
   console.log('Тело запроса:', JSON.stringify(req.body, null, 2));
-  console.log('OPENROUTER_API_KEY из env:', process.env.OPENROUTER_API_KEY ? '[Ключ установлен]' : '[Ключ ОТСУТСТВУЕТ]');
+  console.log('OPENROUTER_API_KEY из env:', process.env.OPENROUTER_API_KEY);
   // =============================
 
   try {
