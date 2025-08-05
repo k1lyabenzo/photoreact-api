@@ -13,19 +13,38 @@ export default async function handler(req, res) {
     return res.status(405).json({ error: 'Method not allowed' });
   }
 
+  // === Добавляем логирование ===
+  console.log('Получен запрос:', req.method, req.url);
+  console.log('Тело запроса:', JSON.stringify(req.body, null, 2));
+  console.log('OPENROUTER_API_KEY из env:', process.env.OPENROUTER_API_KEY ? '[Ключ установлен]' : '[Ключ ОТСУТСТВУЕТ]');
+  // =============================
+
   try {
     // Получаем тело запроса от клиента
     const body = req.body;
+
+    // === Еще одно место для логирования ===
+    const apiKey = process.env.OPENROUTER_API_KEY;
+    if (!apiKey) {
+        console.error('Критическая ошибка: OPENROUTER_API_KEY не найден в переменных окружения!');
+        return res.status(500).json({ error: 'Server configuration error: API key missing' });
+    }
+    // =====================================
 
     // Вызываем OpenRouter API с ключом из переменных окружения
     const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
       method: 'POST',
       headers: {
-        'Authorization': `Bearer ${process.env.OPENROUTER_API_KEY}`, // 🔐 Ключ из переменной
+        'Authorization': `Bearer ${apiKey}`, // Используем локальную переменную для логирования
         'Content-Type': 'application/json'
       },
       body: JSON.stringify(body)
     });
+
+    // === Логируем ответ от OpenRouter (только статус и заголовки, тело может быть большим) ===
+    console.log('Ответ от OpenRouter:', response.status, response.statusText);
+    console.log('Заголовки ответа от OpenRouter:', [...response.headers.entries()]);
+    // =========================================================================================
 
     // Получаем ответ
     const data = await response.json();
